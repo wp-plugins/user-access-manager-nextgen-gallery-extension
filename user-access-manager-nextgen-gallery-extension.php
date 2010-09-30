@@ -7,7 +7,7 @@
  * Author: Alexander Schneider
  * Description: With this plugin you can use the user access manager to control the access for the NextGen Gallery.
  * 
- * uam-ngg.php
+ * user-access-manager-nextgen-gallery-extension.php
  *
  * PHP versions 5
  * 
