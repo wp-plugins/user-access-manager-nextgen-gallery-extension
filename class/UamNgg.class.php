@@ -27,37 +27,17 @@
  
 class UamNgg
 {
-    protected $userAccessManager;
+    protected $adminOptions;
+    protected $adminOptionsName = "uamNggAdminOptions";
     
     /**
      * The constructor.
      * 
-     * @param object &$userAccessManager The user access manager class.
-     * 
      * @return null
      */
-    function __construct(&$userAccessManager)
+    function __construct()
     {
-        $this->userAccessManager = $userAccessManager;
         
-        //Instead of a activation hook we need this.
-        $dir = $this->_getGalleryDir();
-        
-        if (!file_exists($dir.".htaccess")
-            || !file_exists($dir.".htpasswd")
-        ) {
-            $this->activate();
-        }
-    }
-    
-    /**
-     * Returns the user access manager object.
-     * 
-     * @return object
-     */
-    function &getUserAccessManager()
-    {
-        return $this->userAccessManager;
     }
     
     /**
@@ -67,7 +47,9 @@ class UamNgg
      */
     public function activate()
     {
-        $uamOptions = $this->getUserAccessManager()->getAdminOptions();
+        global $userAccessManager;
+        
+        $uamOptions = $userAccessManager->getAdminOptions();
         
         if ($uamOptions['lock_file'] == 'true') {
             $this->_createHtaccessFiles();
@@ -82,6 +64,49 @@ class UamNgg
     public function deactivate()
     {
         $this->_removeHtaccessFiles();
+    }
+    
+    /**
+     * Returns the current settings
+     * 
+     * @return array
+     */
+    public function getAdminOptions()
+    {
+        if (empty($this->adminOptions)) {
+            $uamAdminOptions = array(
+                'hide_album' => 'false', 
+                'album_title' => __('No rights!', 'uam-ngg'),
+                'album_content' => __(
+                    'Sorry you have no rights to view this album!', 
+                    'uam-ngg'
+                ),
+                'hide_gallery' => 'false', 
+                'gallery_title' => __('No rights!', 'uam-ngg'),
+                'gallery_content' => __(
+                    'Sorry you have no rights to view this gallery!', 
+                    'uam-ngg'
+                ),
+                'hide_image' => 'false', 
+                'image_content' => __(
+                    'Sorry you have no rights to view this image!', 
+                    'uam-ngg'
+                ),
+            );
+            
+            $uamOptions = get_option($this->adminOptionsName);
+            
+            if (!empty($uamOptions)) {
+                foreach ($uamOptions as $key => $option) {
+                    $uamAdminOptions[$key] = $option;
+                }
+            }
+            
+            update_option($this->adminOptionsName, $uamAdminOptions);
+            $this->adminOptions = $uamAdminOptions;
+        }
+
+        return $this->adminOptions;
     }
     
     /**
@@ -124,6 +149,7 @@ class UamNgg
         
         return $dir;
     }
+    
     /**
      * Creates the htaccess files.
      * 
@@ -133,12 +159,13 @@ class UamNgg
      */
     private function _createHtaccessFiles($withPasswd = true)
     {
+        global $userAccessManager;
         $dir = $this->_getGalleryDir();
         
-        $this->getUserAccessManager()->createHtaccess($dir, 'nggImage');
+        $userAccessManager->createHtaccess($dir, 'nggImage');
         
         if ($withPasswd) {
-            $this->getUserAccessManager()->createHtpasswd(true, $dir);
+            $userAccessManager->createHtpasswd(true, $dir);
         }
     }
     
@@ -149,9 +176,11 @@ class UamNgg
      */
     private function _removeHtaccessFiles()
     {
+        global $userAccessManager;
+        
         $dir = $this->_getGalleryDir();
         
-        $this->getUserAccessManager()->deleteHtaccessFiles($dir);
+        $userAccessManager->deleteHtaccessFiles($dir);
     }
     
     /*
@@ -167,7 +196,9 @@ class UamNgg
      */
     public function showAlbumItemContent($albumId)
     {
-        $content = $this->getUserAccessManager()->getPlColumn(
+        global $userAccessManager;
+        
+        $content = $userAccessManager->getPlColumn(
             $albumId, 
             'nggAlbum'
         );
@@ -200,7 +231,9 @@ class UamNgg
     public function showGalleryColumn($column, $gallerId)
     {
         if ($column == 'uamAccess') {
-            echo $this->getUserAccessManager()->getPlColumn(
+            global $userAccessManager;
+            
+            echo $userAccessManager->getPlColumn(
                 $gallerId, 
                 'nggGallery'
             );
@@ -232,7 +265,9 @@ class UamNgg
     public function showImageColumn($column, $imageId)
     {
         if ($column == 'uamAccess') {
-            echo $this->getUserAccessManager()->getPlColumn(
+            global $userAccessManager;
+            
+            echo $userAccessManager->getPlColumn(
                 $imageId, 
                 'nggImage'
             );
@@ -253,10 +288,12 @@ class UamNgg
      */
     public function loadImage($image)
     {
-        $uamOptions = $this->getUserAccessManager()->getAdminOptions();
+        global $userAccessManager;
+        
+        $uamOptions = $userAccessManager->getAdminOptions();
         $suffix = 'uamfiletype=nggImage';
         
-        if (!$this->getUserAccessManager()->isPermalinksActive()
+        if (!$userAccessManager->isPermalinksActive()
             && $uamOptions['lock_file'] == 'true'
         ) {
             $prefix = home_url('/').'?uamgetfile=';
@@ -351,7 +388,7 @@ class UamNgg
         $image = $nggdb->find_image($imageId);
 
         $isRecursiveMember = array();
-        
+
         if ($userGroup->objectIsMember('nggGallery', $image->galleryid)) {
             $gallery = $nggdb->find_gallery($image->galleryid);
             
@@ -466,11 +503,13 @@ class UamNgg
      */
     public function showAlbumEditForm($albumId)
     {
+        global $userAccessManager;
+        
         $output = '<tr>';
         $output .= '<th>';
         $output .= 'User Groups<br/>';
         
-        $output .= $this->getUserAccessManager()->showPlGroupSelectionForm(
+        $output .= $userAccessManager->showPlGroupSelectionForm(
             'nggAlbum',
             $albumId
         );
@@ -490,7 +529,9 @@ class UamNgg
      */
     public function updateAlbum($albumId)
     {
-        $this->getUserAccessManager()->savePlObjectData(
+        global $userAccessManager;
+        
+        $userAccessManager->savePlObjectData(
             'nggAlbum', 
             $albumId
         );
@@ -505,13 +546,15 @@ class UamNgg
      */
     public function showGalleryEditForm($galleryId)
     {
+        global $userAccessManager;
+        
         $output = '<tr>';
         $output .= '<th class="left">';
         $output .= 'User Groups';
         $output .= '</th>';
         $output .= '<th class="left">';
         
-        $output .= $this->getUserAccessManager()->showPlGroupSelectionForm(
+        $output .= $userAccessManager->showPlGroupSelectionForm(
             'nggGallery', 
             $galleryId
         );
@@ -531,10 +574,28 @@ class UamNgg
      */
     public function updateGallery($galleryId)
     {
-        $this->getUserAccessManager()->savePlObjectData(
+        global $userAccessManager;
+        
+        $userAccessManager->savePlObjectData(
             'nggGallery', 
             $galleryId
         );
+    }
+    
+    /**
+     * Prints the settings page.
+     * 
+     * @return null
+     */
+    public function printSettingsPage()
+    {
+        if (isset($_GET['page'])) {
+            $curAdminPage = $_GET['page'];
+        }
+        
+        if ($curAdminPage == 'uam_ngg_settings') {
+            include UAM_NGG_REALPATH."tpl/adminSettings.php";
+        }
     }
     
     public function showSlideShow($out, $object)
@@ -559,11 +620,13 @@ class UamNgg
      */
     public function showGalleryContent($output, $gallerId)
     {
-        $uamAccessHandler = $this->getUserAccessManager()->getAccessHandler();
+        global $userAccessManager;
+        
+        $uamAccessHandler = $userAccessManager->getAccessHandler();
+        $options = $this->getAdminOptions();
         
         if (!$uamAccessHandler->checkObjectAccess('nggGallery', $gallerId)) {
-            //TODO
-            $output = "No access";
+            $output = $options['gallery_content'];
         }
         
         return $output;
@@ -614,41 +677,28 @@ class UamNgg
         
         return $out;
     }
+
     
-    public function showGalleryRelatedContent($out, $object)
+    /**
+     * Manupulates the output of a album.
+     * 
+     * @param string  $output  The output.
+     * @param integer $albumId The album id.
+     * 
+     * @return string
+     */
+    public function showAlbumContent($output, $albumId)
     {
-        echo "showGalleryRelatedContent - ";
-        echo "out: ";
-        print_r($out);
-        echo "<br>object: ";
-        print_r($object);
-        echo "<br>";
+        global $userAccessManager;
         
-        return $out;
-    }
-    
-    public function showGalleryTagsContent($out, $object)
-    {
-        echo "showGalleryTagsContent - ";
-        echo "out: ";
-        print_r($out);
-        echo "<br>object: ";
-        print_r($object);
-        echo "<br>";
+        $uamAccessHandler = $userAccessManager->getAccessHandler();
+        $options = $this->getAdminOptions();
         
-        return $out;
-    }
-    
-    public function showAlbumContent($out, $object)
-    {
-        echo "showAlbumContent - ";
-        echo "out: ";
-        print_r($out);
-        echo "<br>object: ";
-        print_r($object);
-        echo "<br>";
+        if (!$uamAccessHandler->checkObjectAccess('nggAlbum', $albumId)) {
+            $output = $options['gallery_album'];
+        }
         
-        return $out;
+        return $output;
     }
     
     public function showAlbumTagsContent($out, $object)
