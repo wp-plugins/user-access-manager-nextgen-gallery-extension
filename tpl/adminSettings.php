@@ -14,29 +14,20 @@
  * @version   SVN: $Id$
  * @link      http://wordpress.org/extend/plugins/user-access-manager/nextgen-gallery/
  */
-global $userAccessManager;
-$uamOptions = $userAccessManager->getAdminOptions();
+global $uamNgg;
+$uamNggOptions = $uamNgg->getAdminOptions();
 
-if (isset($_POST['update_uam_settings'])) {    
-    foreach ($uamOptions as $option => $value) {
-        if (isset($_POST['uam_' . $option])) {
-            $uamOptions[$option] = $_POST['uam_' . $option];
+if (isset($_POST['update_uamngg_settings'])) {    
+    foreach ($uamNggOptions as $option => $value) {
+        if (isset($_POST['uamngg_' . $option])) {
+            $uamNggOptions[$option] = $_POST['uamngg_' . $option];
         }
     }
     
-    update_option($this->adminOptionsName, $uamOptions);
-    
-    if ($_POST['uam_lock_file'] == 'false') {
-        $userAccessManager->deleteHtaccessFiles();
-    } else {
-        $userAccessManager->createHtaccess();
-        $userAccessManager->createHtpasswd(true);
-    }
-    
-    do_action('uam_update_options', $uamOptions);
+    update_option($this->adminOptionsName, $uamNggOptions);
     ?>
     <div class="updated">
-    	<p><strong><?php echo TXT_UPDATE_SETTINGS; ?></strong></p>
+    	<p><strong><?php echo TXT_UAMNGG_UPDATE_SETTINGS; ?></strong></p>
     </div>
     <?php
 }
@@ -44,37 +35,142 @@ if (isset($_POST['update_uam_settings'])) {
 
 <div class="wrap">
     <form method="post" action="<?php echo $_SERVER["REQUEST_URI"]; ?>">
-        <h2><?php echo TXT_SETTINGS; ?></h2>
-        <h3><?php echo TXT_POST_SETTING; ?></h3>
-        <p><?php echo TXT_POST_SETTING_DESC; ?></p>
-<table class="form-table">
-	<tbody>
-		<tr valign="top">
-			<th scope="row"><?php echo TXT_HIDE_POST; ?></th>
-			<td>
-				<label for="uam_hide_post_yes">
-					<input type="radio" id="uam_hide_post_yes" class="uam_hide_post" name="uam_hide_post" value="true" <?php 
-if ($uamOptions['hide_post'] == "true") { 
+        <h2><?php echo TXT_UAMNGG_SETTINGS; ?></h2>
+        <h3><?php echo TXT_UAMNGG_ALBUM_SETTING; ?></h3>
+        <p><?php echo TXT_UAMNGG_ALBUM_SETTING_DESC; ?></p>
+        <table class="form-table">
+        	<tbody>
+        		<tr valign="top">
+        			<th scope="row"><?php echo TXT_UAMNGG_HIDE_ALBUM; ?></th>
+        			<td>
+        				<label for="uamngg_hide_album_yes">
+        					<input type="radio" id="uamngg_hide_album_yes" class="uamngg_hide_post" name="uamngg_hide_album" value="true" <?php 
+if ($uamNggOptions['hide_album'] == "true") { 
     echo 'checked="checked"';
 } 
-                    ?> />
-				    <?php echo TXT_YES; ?> 
-				</label>&nbsp;&nbsp;&nbsp;&nbsp; 
-				<label for="uam_hide_post_no">
-					<input type="radio" id="uam_hide_post_no" class="uam_hide_post" name="uam_hide_post" value="false" <?php
-if ($uamOptions['hide_post'] == "false") {
+                            ?> />
+        				    <?php echo TXT_UAMNGG_YES; ?> 
+        				</label>&nbsp;&nbsp;&nbsp;&nbsp; 
+        				<label for="uamngg_hide_album_no">
+        					<input type="radio" id="uamngg_hide_album_no" class="uamngg_hide_post" name="uamngg_hide_album" value="false" <?php
+if ($uamNggOptions['hide_album'] == "false") {
     echo 'checked="checked"';
 } 
-                    ?> />
-				    <?php echo TXT_NO; ?>
-				</label> <br />
-				<?php echo TXT_HIDE_POST_DESC; ?>
-			</td>
-		</tr>
-	</tbody>
-</table>
-<div class="submit">
-	<input type="submit" name="update_uam_ngg_settings" value="<?php echo TXT_UPDATE_SETTING; ?>" />
-</div>
-</form>
+                            ?> />
+        				    <?php echo TXT_UAMNGG_NO; ?>
+        				</label> <br />
+        				<?php echo TXT_UAMNGG_HIDE_ALBUM_DESC; ?>
+        			</td>
+        		</tr>
+				<tr>
+        			<th><?php echo TXT_UAMNGG_ALBUM_CONTENT; ?></th>
+        			<td>
+        				<textarea name="uamngg_album_content" style="width: 80%; height: 100px;" cols="40" rows="10" ><?php 
+echo apply_filters('format_to_edit', $uamNggOptions['album_content']); 
+                        ?></textarea>
+        				<br />
+        			    <?php echo TXT_UAMNGG_ALBUM_CONTENT_DESC; ?>
+        			</td>
+        		</tr>
+        	</tbody>
+        </table>
+        <h3><?php echo TXT_UAMNGG_GALLERY_SETTING; ?></h3>
+        <p><?php echo TXT_UAMNGG_GALLERY_SETTING_DESC; ?></p>
+        <table class="form-table">
+        	<tbody>
+        		<tr valign="top">
+        			<th scope="row"><?php echo TXT_UAMNGG_HIDE_GALLERY; ?></th>
+        			<td>
+        				<label for="uamngg_hide_gallery_yes">
+        					<input type="radio" id="uamngg_hide_gallery_yes" class="uamngg_hide_gallery" name="uamngg_hide_gallery" value="true" <?php 
+if ($uamNggOptions['hide_gallery'] == "true") { 
+    echo 'checked="checked"';
+} 
+                            ?> />
+        				    <?php echo TXT_UAMNGG_YES; ?> 
+        				</label>&nbsp;&nbsp;&nbsp;&nbsp; 
+        				<label for="uamngg_hide_gallery_no">
+        					<input type="radio" id="uamngg_hide_gallery_no" class="uamngg_hide_gallery" name="uamngg_hide_gallery" value="false" <?php
+if ($uamNggOptions['hide_gallery'] == "false") {
+    echo 'checked="checked"';
+} 
+                            ?> />
+        				    <?php echo TXT_UAMNGG_NO; ?>
+        				</label> <br />
+        				<?php echo TXT_UAMNGG_HIDE_GALLERY_DESC; ?>
+        			</td>
+        		</tr>
+        		<tr valign="top">
+        			<th scope="row"><?php echo TXT_UAMNGG_HIDE_GALLERY_TITLE; ?></th>
+        			<td>
+        				<label for="uamngg_hide_gallery_title_yes">
+        					<input type="radio" id="uamngg_hide_gallery_yes" class="uamngg_hide_gallery_title" name="uamngg_hide_gallery_title" value="true" <?php 
+if ($uamNggOptions['hide_gallery_title'] == "true") { 
+    echo 'checked="checked"';
+} 
+                            ?> />
+        				    <?php echo TXT_UAMNGG_YES; ?> 
+        				</label>&nbsp;&nbsp;&nbsp;&nbsp; 
+        				<label for="uamngg_hide_gallery_title_no">
+        					<input type="radio" id="uamngg_hide_gallery_no" class="uamngg_hide_gallery_title" name="uamngg_hide_gallery_title" value="false" <?php
+if ($uamNggOptions['hide_gallery_title'] == "false") {
+    echo 'checked="checked"';
+} 
+                            ?> />
+        				    <?php echo TXT_UAMNGG_NO; ?>
+        				</label> <br />
+        				<?php echo TXT_UAMNGG_HIDE_GALLERY_TITLE_DESC; ?>
+        			</td>
+        		</tr>
+        		<tr valign="top">
+            		<th scope="row"><?php echo TXT_UAMNGG_GALLERY_TITLE; ?></th>
+            		<td>
+            			<input name="uamngg_gallery_title" value="<?php echo $uamNggOptions['gallery_title']; ?>" /> <br />
+            			<?php echo TXT_UAMNGG_GALLERY_TITLE_DESC; ?>
+            		</td>
+            	</tr>
+				<tr>
+        			<th><?php echo TXT_UAMNGG_GALLERY_CONTENT; ?></th>
+        			<td>
+        				<textarea name="uamngg_gallery_content" style="width: 80%; height: 100px;" cols="40" rows="10" ><?php 
+echo apply_filters('format_to_edit', $uamNggOptions['gallery_content']); 
+                        ?></textarea>
+        				<br />
+        			    <?php echo TXT_UAMNGG_GALLERY_CONTENT_DESC; ?>
+        			</td>
+        		</tr>
+        	</tbody>	
+        </table>
+        <h3><?php echo TXT_UAMNGG_IMAGE_SETTING; ?></h3>
+        <p><?php echo TXT_UAMNGG_IMAGE_SETTING_DESC; ?></p>
+        <table class="form-table">
+        	<tbody>
+        		<tr valign="top">
+        			<th scope="row"><?php echo TXT_UAMNGG_HIDE_IMAGE; ?></th>
+        			<td>
+        				<label for="uamngg_hide_image_yes">
+        					<input type="radio" id="uamngg_hide_image_yes" class="uamngg_hide_image" name="uamngg_hide_image" value="true" <?php 
+if ($uamNggOptions['hide_image'] == "true") { 
+    echo 'checked="checked"';
+} 
+                            ?> />
+        				    <?php echo TXT_UAMNGG_YES; ?> 
+        				</label>&nbsp;&nbsp;&nbsp;&nbsp; 
+        				<label for="uamngg_hide_image_no">
+        					<input type="radio" id="uamngg_hide_image_no" class="uamngg_hide_image" name="uamngg_hide_image" value="false" <?php
+if ($uamNggOptions['hide_image'] == "false") {
+    echo 'checked="checked"';
+} 
+                            ?> />
+        				    <?php echo TXT_UAMNGG_NO; ?>
+        				</label> <br />
+        				<?php echo TXT_UAMNGG_HIDE_IMAGE_DESC; ?>
+        			</td>
+        		</tr>
+        	</tbody>
+        </table>
+        <div class="submit">
+        	<input type="submit" name="update_uamngg_settings" value="<?php echo TXT_UAMNGG_NGG_UPDATE_SETTING; ?>" />
+        </div>
+	</form>
 </div>

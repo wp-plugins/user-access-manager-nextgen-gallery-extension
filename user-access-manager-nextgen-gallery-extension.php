@@ -52,7 +52,7 @@ if (!isset($ngg)) {
         create_function(
             '', 
             'echo \'<div id="message" class="error"><p><strong>'. 
-            TXT_NGG_MISSING.
+            TXT_UAMNGG_NGG_MISSING.
             '</strong></p></div>\';'
         )
     );
@@ -64,7 +64,7 @@ if (!isset($ngg)) {
         create_function(
             '', 
             'echo \'<div id="message" class="error"><p><strong>'. 
-            sprintf(TXT_NGG_TO_LOW, doubleval($ngg->version)).
+            sprintf(TXT_UAMNGG_NGG_TO_LOW, doubleval($ngg->version)).
             '</strong></p></div>\';'
         )
     );
@@ -152,17 +152,18 @@ if (!function_exists("initUamToNggExtension")) {
             //add_filter('ngg_show_slideshow_content', array(&$uamNgg, 'showSlideShow'), 10, 2);
             
             add_filter('ngg_show_gallery_content', array(&$uamNgg, 'showGalleryContent'), 10, 2);
-            add_filter('ngg_gallery_output', array(&$uamNgg, 'showGalleryOutput'), 10, 2);
-            add_filter('ngg_album_galleryobject', array(&$uamNgg, 'showGalleryObject'), 10, 2);
-            add_filter('ngg_album_galleries', array(&$uamNgg, 'showGalleries'), 10, 2);
+            add_filter('ngg_picturelist_object', array(&$uamNgg, 'showGalleryImages'), 10, 2);
+            
             //add_filter('ngg_show_related_gallery_content', array(&$uamNgg, 'showGalleryRelatedContent'), 10, 2);
             //add_filter('ngg_show_gallery_tags_content', array(&$uamNgg, 'showGalleryTagsContent'), 10, 2);
             
             add_filter('ngg_show_album_content', array(&$uamNgg, 'showAlbumContent'), 10, 2);
             add_filter('ngg_show_album_tags_content', array(&$uamNgg, 'showAlbumTagsContent'), 10, 2);
+            add_filter('ngg_album_galleryobject', array(&$uamNgg, 'showGalleryObjectForAlbum'), 10);
+            add_filter('ngg_album_galleries', array(&$uamNgg, 'showGalleriesForAlbum'), 10);
             
-            add_filter('ngg_show_images_content', array(&$uamNgg, 'showImageContent'), 10, 2); 
-            add_filter('ngg_show_imagebrowser_content', array(&$uamNgg, 'showImageBrowserContent'), 10, 2);
+            //add_filter('ngg_show_images_content', array(&$uamNgg, 'showImageContent'), 10, 2); 
+            //add_filter('ngg_show_imagebrowser_content', array(&$uamNgg, 'showImageBrowserContent'), 10, 2);
             
             add_filter('ngg_manage_gallery_columns', array(&$uamNgg, 'showGalleryHeadColumn'));
             add_filter('ngg_manage_images_columns', array(&$uamNgg, 'showImageHeadColumn'));
@@ -191,7 +192,7 @@ if (!function_exists("uamNggAPMenu")) {
          */
         
         if (function_exists('add_submenu_page')) {
-            add_submenu_page('uam_usergroup', TXT_NGG_GALLERY_SETTING, TXT_NGG_GALLERY_SETTING, 'read', 'uam_ngg_settings', array(&$uamNgg, 'printSettingsPage'));
+            add_submenu_page('uam_usergroup', TXT_UAMNGG_NGG_GALLERY_SETTING, TXT_UAMNGG_NGG_GALLERY_SETTING, 'read', 'uam_ngg_settings', array(&$uamNgg, 'printSettingsPage'));
         }
     }
 }
