@@ -10,7 +10,9 @@ With this plugin you can use the "User Access Manager" to control the access for
 
 == Description ==
 
-This plugin allows you to use the "User Access Manager"-Plugin to control the access for the "NextGEN Galley"-Plugin. You can lock Albums, Galleries and Images.
+This plugin allows you to use the [User Access Manager](http://wordpress.org/extend/plugins/user-access-manager/)-Plugin to control the access for the [NextGEN Galley](http://wordpress.org/extend/plugins/nextgen-gallery/)-Plugin. You can lock Albums, Galleries and Images.
+
+<b>Note: This plugin works only with the current developer version of the NextGEN Gallery-Plugin which you can get [here](http://code.google.com/p/nextgen-gallery/source/checkout).</b>
 
 <em>Feature list</em>
 
