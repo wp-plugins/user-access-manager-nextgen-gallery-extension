@@ -455,13 +455,15 @@ class UamNgg
      */
     private function _getImageFromUrl($url)
     {
-        global $ngg;
-        $url = $ngg->options['gallerypath'].$url;
+        global $ngg, $userAccessManager;
+        
+        if ($userAccessManager->isPermalinksActive()) {
+            $url = $ngg->options['gallerypath'].$url;
+        }
+        
         $url = str_replace(site_url().'/', '', $url);        
         $thumbsStr = '/thumbs/thumbs_';
         $thumb = false;
-        
-        echo $url."<br>";
         
         if (strpos($url, $thumbsStr)) {
             $expUrl = explode($thumbsStr, $url);

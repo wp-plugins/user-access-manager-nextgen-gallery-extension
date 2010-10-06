@@ -44,7 +44,7 @@ if (defined('UAM_LOCAL_DEBUG')) {
 require_once 'includes/language.define.php';
 
 //Check requirements
-global $ngg;
+global $ngg, $userAccessManager;
 
 if (!isset($ngg)) {
     add_action(
@@ -58,13 +58,13 @@ if (!isset($ngg)) {
     );
     
     return;
-} elseif (doubleval($ngg->version) < 1.7) {
+} elseif (version_compare($ngg->version, '1.7') === -1) {
     add_action(
         'admin_notices', 
         create_function(
             '', 
             'echo \'<div id="message" class="error"><p><strong>'. 
-            sprintf(TXT_UAMNGG_NGG_TO_LOW, doubleval($ngg->version)).
+            sprintf(TXT_UAMNGG_NGG_TO_LOW, $ngg->version).
             '</strong></p></div>\';'
         )
     );
@@ -73,9 +73,7 @@ if (!isset($ngg)) {
 }
 
 
-
 require_once 'class/UamNgg.class.php';
-global $userAccessManager;
 
 if (class_exists("UamNgg")) {
     $uamNgg = new UamNgg($userAccessManager);
@@ -91,6 +89,20 @@ if (!function_exists("initUamToNggExtension")) {
      */
     function initUamToNggExtension($userAccessManager) 
     {
+        if (version_compare($userAccessManager->getVersion(), '1.1.2') === -1) {
+            add_action(
+                'admin_notices', 
+                create_function(
+                    '', 
+                    'echo \'<div id="message" class="error"><p><strong>'. 
+                    sprintf(TXT_UAMNGG_UAM_TO_LOW, $userAccessManager->getVersion()).
+                    '</strong></p></div>\';'
+                )
+            );
+            
+            return;
+        }
+        
         global $uamNgg;
         
         /*
