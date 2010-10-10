@@ -41,6 +41,6 @@ Here you found the changes in each version.
 
     Version		Date      	Changes
 	
-	0.1.1 Beta  2010/10/XX  Path changes for UAM.
+	0.1.1 Beta  2010/10/09  Path changes for UAM.
 
     0.1 Beta	2010/10/04	First beta release.
