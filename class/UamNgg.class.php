@@ -427,7 +427,8 @@ class UamNgg
         if (!$userAccessManager->isPermalinksActive()
             && $uamOptions['lock_file'] == 'true'
         ) {
-            $prefix = home_url('/').'?uamgetfile=';
+            //Adding '.jpg' to the prefix prevents thickbox display error
+            $prefix = home_url('/').'.jpg?uamgetfile=';
 
             $image->imageURL = $prefix.$image->imageURL.'&'.$suffix;
             $image->thumbURL = $prefix.$image->thumbURL.'&'.$suffix;
