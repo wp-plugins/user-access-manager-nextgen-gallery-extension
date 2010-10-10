@@ -41,7 +41,7 @@ Here you found the changes in each version.
 
     Version		Date      	Changes
     
-    0.1.1 Beta  2010/10/10  Fix locked image bug.
+    0.1.2 Beta  2010/10/10  Fix locked image bug.
     						Fix image to group assignation bug.
 	
 	0.1.1 Beta  2010/10/09  Path changes for UAM.
