@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_i
 Tags: admin, access, gallery, galleries, image, images, member area, members, member, member access, nextgen, NextGEN Gallery, page, pages, post, posts, private, privacy, restrict, user, user access manager, user management
 Requires at least: 3.0
 Tested up to: 3.0
-Stable tag: 0.1.1 Beta
+Stable tag: 0.1.2 Beta
 
 With this plugin you can use the "User Access Manager" to control the access for the "NextGen Gallery".
 
@@ -40,7 +40,10 @@ This plugin allows you to use the [User Access Manager](http://wordpress.org/ext
 Here you found the changes in each version.
 
     Version		Date      	Changes
+    
+    0.1.1 Beta  2010/10/10  Fix locked image bug.
+    						Fix image to group assignation bug.
 	
-	0.1.1 Beta  2010/10/XX  Path changes for UAM.
+	0.1.1 Beta  2010/10/09  Path changes for UAM.
 
     0.1 Beta	2010/10/04	First beta release.

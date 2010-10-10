@@ -269,6 +269,8 @@ class UamNgg
                 $imageId,
                 'nggImage['.$imageId.']'
             );
+            
+            echo '<input type="hidden" name="nggUpdateImage[]" value="'.$imageId.'" />';
         }
     }
     
@@ -359,19 +361,31 @@ class UamNgg
             $galleryId
         );
         
+        $nggImagesGroups = array();
+        
         if (isset($_POST['nggImage'])) {
-            $nggImages = $_POST['nggImage'];
+            $nggImagesGroups = $_POST['nggImage'];
+        }
+        
+        if (isset($_POST['nggUpdateImage'])) {
+            $nggUpdateImages = $_POST['nggUpdateImage'];
             
-            foreach ($nggImages as $nggImageId => $nggImageGroups) {
-                print_r($nggImageGroups);
+            foreach ($nggUpdateImages as $nggImageId) {
+                $imageGroups = array();
+                
+                if (isset($nggImagesGroups[$nggImageId])) {
+                    $imageGroups = $nggImagesGroups[$nggImageId];
+                }
                 
                 $userAccessManager->savePlObjectData(
                     'nggImage', 
                     $nggImageId,
-                    $nggImageGroups
+                    $imageGroups
                 );
             }
         }
+        
+        
 
     }
     
@@ -667,11 +681,11 @@ class UamNgg
             $filterdImages = array();
             
             foreach ($images as $key => $image) {
-                if ($uamAccessHandler->checkObjectAccess('nggImage', $image->galleryid)) {
+                if ($uamAccessHandler->checkObjectAccess('nggImage', $image->pid)) {
                     $filterdImages[$key] = $image;
                 }
             }
-    
+            
             return $filterdImages;
         }
         
