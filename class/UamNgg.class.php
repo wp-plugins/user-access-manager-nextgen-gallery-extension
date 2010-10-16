@@ -564,7 +564,8 @@ class UamNgg
         $isRecursiveMember = array();
         
         foreach ($albums as $album) {
-            if (in_array($galleryId, unserialize($album->sortorder))
+            if (is_array(unserialize($album->sortorder))
+                && in_array($galleryId, unserialize($album->sortorder))
                 && $userGroup->objectIsMember('nggAlbum', $album->id)            
             ) {
                 $albumObject->name = $album->name;
