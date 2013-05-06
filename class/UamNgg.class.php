@@ -27,13 +27,11 @@
  
 class UamNgg
 {
-    protected $adminOptions;
-    protected $adminOptionsName = "uamNggAdminOptions";
+    protected $_aAdminOptions;
+    protected $_sAdminOptionsName = "uamNggAdminOptions";
     
     /**
      * The constructor.
-     * 
-     * @return null
      */
     function __construct()
     {
@@ -47,11 +45,11 @@ class UamNgg
      */
     public function activate()
     {
-        global $userAccessManager;
+        global $oUserAccessManager;
         
-        $uamOptions = $userAccessManager->getAdminOptions();
+        $aUamOptions = $oUserAccessManager->getAdminOptions();
         
-        if ($uamOptions['lock_file'] == 'true') {
+        if ($aUamOptions['lock_file'] == 'true') {
             $this->_createHtaccessFiles();
         }
     }
@@ -73,8 +71,8 @@ class UamNgg
      */
     public function getAdminOptions()
     {
-        if (empty($this->adminOptions)) {
-            $uamAdminOptions = array(
+        if (empty($this->_aAdminOptions)) {
+            $aUamAdminOptions = array(
                 'hide_album' => 'false', 
                 'album_content' => __(
                     'Sorry you have no rights to view this album!', 
@@ -90,19 +88,19 @@ class UamNgg
                 'hide_image' => 'false',
             );
             
-            $uamOptions = get_option($this->adminOptionsName);
+            $aUamOptions = get_option($this->_sAdminOptionsName);
             
-            if (!empty($uamOptions)) {
-                foreach ($uamOptions as $key => $option) {
-                    $uamAdminOptions[$key] = $option;
+            if (!empty($aUamOptions)) {
+                foreach ($aUamOptions as $sKey => $mOption) {
+                    $aUamAdminOptions[$sKey] = $mOption;
                 }
             }
             
-            update_option($this->adminOptionsName, $uamAdminOptions);
-            $this->adminOptions = $uamAdminOptions;
+            update_option($this->_sAdminOptionsName, $aUamAdminOptions);
+            $this->_aAdminOptions = $aUamAdminOptions;
         }
 
-        return $this->adminOptions;
+        return $this->_aAdminOptions;
     }
     
     /**
@@ -118,13 +116,13 @@ class UamNgg
     /**
      * The function for the uam_update_options action.
      * 
-     * @param array $uamOptions The User Access Manager Options
+     * @param array $aUamOptions The User Access Manager Options
      * 
      * @return null
      */
-    public function updateUamSettings($uamOptions)
+    public function updateUamSettings($aUamOptions)
     {
-        if ($uamOptions['lock_file'] == 'false') {
+        if ($aUamOptions['lock_file'] == 'false') {
             $this->_removeHtaccessFiles();
         } else {
             $this->_createHtaccessFiles();
@@ -138,30 +136,30 @@ class UamNgg
      */
     private function _getGalleryDir()
     {
-        $dir = str_replace("\\", "/", ABSPATH);
+        $sDir = str_replace("\\", "/", ABSPATH);
         
         global $ngg;
-        $dir .= $ngg->options['gallerypath'];
+        $sDir .= $ngg->options['gallerypath'];
         
-        return $dir;
+        return $sDir;
     }
     
     /**
      * Creates the htaccess files.
      * 
-     * @param boolean $withPasswd If true create also the htpasswd file.
+     * @param boolean $blWithPassword If true create also the htpasswd file.
      * 
      * @return null
      */
-    private function _createHtaccessFiles($withPasswd = true)
+    private function _createHtaccessFiles($blWithPassword = true)
     {
-        global $userAccessManager;
-        $dir = $this->_getGalleryDir();
+        global $oUserAccessManager;
+        $sDir = $this->_getGalleryDir();
         
-        $userAccessManager->createHtaccess($dir, 'nggImage');
+        $oUserAccessManager->createHtaccess($sDir, 'nggImage');
         
-        if ($withPasswd) {
-            $userAccessManager->createHtpasswd(true, $dir);
+        if ($blWithPassword) {
+            $oUserAccessManager->createHtpasswd(true, $sDir);
         }
     }
     
@@ -172,11 +170,11 @@ class UamNgg
      */
     private function _removeHtaccessFiles()
     {
-        global $userAccessManager;
+        global $oUserAccessManager;
         
-        $dir = $this->_getGalleryDir();
+        $sDir = $this->_getGalleryDir();
         
-        $userAccessManager->deleteHtaccessFiles($dir);
+        $oUserAccessManager->deleteHtaccessFiles($sDir);
     }
     
     
@@ -187,52 +185,52 @@ class UamNgg
     /**
      * Add additional content to the album box.
      * 
-     * @param integer $galleryId The gallery id.
+     * @param integer $sGalleryId The gallery id.
      * 
      * @return null
      */
-    public function showAlbumItemContent($galleryId)
+    public function showAlbumItemContent($sGalleryId)
     {
-        global $userAccessManager;
+        global $oUserAccessManager;
         
-        $content = $userAccessManager->getPlColumn(
+        $sContent = $oUserAccessManager->getPlColumn(
             'nggGallery',
-            $galleryId
+            $sGalleryId
         );
         
-        return '<p><b>'.__('Access', 'uam-ngg').':</b> '.$content.'</p>';
+        return '<p><b>'.__('Access', 'uam-ngg').':</b> '.$sContent.'</p>';
     }
     
     /**
      * Adds a column header to the gallery columns.
      * 
-     * @param array $galleryColumns The gallery columns.
+     * @param array $aGalleryColumns The gallery columns.
      * 
      * @return array
      */
-    public function showGalleryHeadColumn($galleryColumns)
+    public function showGalleryHeadColumn($aGalleryColumns)
     {
-        $galleryColumns['uamAccess'] = __('Access', 'uam-ngg');
+        $aGalleryColumns['uamAccess'] = __('Access', 'uam-ngg');
         
-        return $galleryColumns;
+        return $aGalleryColumns;
     }
     
     /**
      * Add the column content for the uamAccess column.
      * 
-     * @param string  $column   The column name.
-     * @param integer $gallerId The gallery id.
+     * @param string  $sColumn   The column name.
+     * @param integer $iGalleryId The gallery id.
      * 
      * @return null
      */
-    public function showGalleryColumn($column, $gallerId)
+    public function showGalleryColumn($sColumn, $iGalleryId)
     {
-        if ($column == 'uamAccess') {
-            global $userAccessManager;
+        if ($sColumn == 'uamAccess') {
+            global $oUserAccessManager;
             
-            echo $userAccessManager->getPlColumn(
+            echo $oUserAccessManager->getPlColumn(
                 'nggGallery',
-                $gallerId
+                $iGalleryId
             );
         }
     }
@@ -240,147 +238,147 @@ class UamNgg
     /**
      * Adds a column header to the image columns.
      * 
-     * @param array $imageColumns The gallery columns.
+     * @param array $aImageColumns The gallery columns.
      * 
      * @return array
      */
-    public function showImageHeadColumn($imageColumns)
+    public function showImageHeadColumn($aImageColumns)
     {
-        $imageColumns['uamAccess'] = __('Access', 'uam-ngg');
+        $aImageColumns['uamAccess'] = __('Access', 'uam-ngg');
         
-        return $imageColumns;
+        return $aImageColumns;
     }
     
     /**
      * Add the column content for the uamAccess column.
      * 
-     * @param string  $column  The column name.
-     * @param integer $imageId The image id.
+     * @param string  $sColumn  The column name.
+     * @param integer $iImageId The image id.
      * 
      * @return null
      */
-    public function showImageColumn($column, $imageId)
+    public function showImageColumn($sColumn, $iImageId)
     {
-        if ($column == 'uamAccess') {
-            global $userAccessManager;
+        if ($sColumn == 'uamAccess') {
+            global $oUserAccessManager;
             
-            echo $userAccessManager->showPlGroupSelectionForm(
+            echo $oUserAccessManager->showPlGroupSelectionForm(
                 'nggImage',
-                $imageId,
-                'nggImage['.$imageId.']'
+                $iImageId,
+                'nggImage['.$iImageId.']'
             );
             
-            echo '<input type="hidden" name="nggUpdateImage[]" value="'.$imageId.'" />';
+            echo '<input type="hidden" name="nggUpdateImage[]" value="'.$iImageId.'" />';
         }
     }
     
     /**
      * Shows the user group selection form at the album settings page.
      * 
-     * @param integer $albumId The id of the album.
+     * @param integer $iAlbumId The id of the album.
      * 
      * @return null
      */
-    public function showAlbumEditForm($albumId)
+    public function showAlbumEditForm($iAlbumId)
     {
-        global $userAccessManager;
+        global $oUserAccessManager;
         
-        $output = '<tr>';
-        $output .= '<th>';
-        $output .= 'User Groups<br/>';
+        $sOutput = '<tr>';
+        $sOutput .= '<th>';
+        $sOutput .= 'User Groups<br/>';
         
-        $output .= $userAccessManager->showPlGroupSelectionForm(
+        $sOutput .= $oUserAccessManager->showPlGroupSelectionForm(
             'nggAlbum',
-            $albumId
+            $iAlbumId
         );
         
-        $output .= '</th>';
-        $output .= '</tr>';
+        $sOutput .= '</th>';
+        $sOutput .= '</tr>';
         
-        echo $output;
+        echo $sOutput;
     }
     
     /**
      * Saves the user groups for the album.
      * 
-     * @param integer $albumId The id of the album.
+     * @param integer $iAlbumId The id of the album.
      * 
      * @return null
      */
-    public function updateAlbum($albumId)
+    public function updateAlbum($iAlbumId)
     {
-        global $userAccessManager;
+        global $oUserAccessManager;
         
-        $userAccessManager->savePlObjectData(
+        $oUserAccessManager->savePlObjectData(
             'nggAlbum', 
-            $albumId
+            $iAlbumId
         );
     }
     
     /**
      * Shows the user group selection form at the gallery settings page.
      * 
-     * @param integer $galleryId The id of the gallery.
+     * @param integer $iGalleryId The id of the gallery.
      * 
      * @return null
      */
-    public function showGalleryEditForm($galleryId)
+    public function showGalleryEditForm($iGalleryId)
     {
-        global $userAccessManager;
+        global $oUserAccessManager;
         
-        $output = '<tr>';
-        $output .= '<th class="left">';
-        $output .= 'User Groups';
-        $output .= '</th>';
-        $output .= '<th class="left">';
+        $sOutput = '<tr>';
+        $sOutput .= '<th class="left">';
+        $sOutput .= 'User Groups';
+        $sOutput .= '</th>';
+        $sOutput .= '<th class="left">';
         
-        $output .= $userAccessManager->showPlGroupSelectionForm(
+        $sOutput .= $oUserAccessManager->showPlGroupSelectionForm(
             'nggGallery', 
-            $galleryId
+            $iGalleryId
         );
         
-        $output .= '</th>';
-        $output .= '</tr>';
+        $sOutput .= '</th>';
+        $sOutput .= '</tr>';
         
-        echo $output;
+        echo $sOutput;
     }
     
     /**
      * Saves the user groups for the gallery.
      * 
-     * @param integer $galleryId The id of the gallery.
+     * @param integer $iGalleryId The id of the gallery.
      * 
      * @return null
      */
-    public function updateGallery($galleryId)
+    public function updateGallery($iGalleryId)
     {
-        global $userAccessManager;
+        global $oUserAccessManager;
         
-        $userAccessManager->savePlObjectData(
+        $oUserAccessManager->savePlObjectData(
             'nggGallery', 
-            $galleryId
+            $iGalleryId
         );
         
-        $nggImagesGroups = array();
+        $aNggImagesGroups = array();
         
         if (isset($_POST['nggImage'])) {
-            $nggImagesGroups = $_POST['nggImage'];
+            $aNggImagesGroups = $_POST['nggImage'];
         }
         
         if (isset($_POST['nggUpdateImage'])) {
-            $nggUpdateImages = $_POST['nggUpdateImage'];
+            $aNggUpdateImages = $_POST['nggUpdateImage'];
             
-            foreach ($nggUpdateImages as $nggImageId) {
-                $imageGroups = array();
+            foreach ($aNggUpdateImages as $nggImageId) {
+                $iImageGroups = array();
                 
-                if (isset($nggImagesGroups[$nggImageId])) {
-                    $imageGroups = $nggImagesGroups[$nggImageId];
+                if (isset($aNggImagesGroups[$nggImageId])) {
+                    $iImageGroups = $aNggImagesGroups[$nggImageId];
                 }
                 
-                $userAccessManager->savePlObjectData(
+                $oUserAccessManager->savePlObjectData(
                     'nggImage', 
                     $nggImageId,
-                    $imageGroups
+                    $iImageGroups
                 );
             }
         }
@@ -397,11 +395,11 @@ class UamNgg
     public function printSettingsPage()
     {
         if (isset($_GET['page'])) {
-            $curAdminPage = $_GET['page'];
-        }
-        
-        if ($curAdminPage == 'uam_ngg_settings') {
-            include UAM_NGG_REALPATH."tpl/adminSettings.php";
+            $sCurAdminPage = $_GET['page'];
+
+            if ($sCurAdminPage == 'uam_ngg_settings') {
+                include UAM_NGG_REALPATH."tpl/adminSettings.php";
+            }
         }
     }
     
@@ -413,107 +411,109 @@ class UamNgg
     /**
      * Manipulates the image url.
      * 
-     * @param object $image The image object.
+     * @param object $oImage The image object.
      * 
      * @return null
      */
-    public function loadImage($image)
+    public function loadImage($oImage)
     {
-        global $userAccessManager;
+        global $oUserAccessManager;
         
-        $uamOptions = $userAccessManager->getAdminOptions();
-        $suffix = 'uamfiletype=nggImage';
+        $aUamOptions = $oUserAccessManager->getAdminOptions();
+        $sSuffix = 'uamfiletype=nggImage';
         
-        if (!$userAccessManager->isPermalinksActive()
-            && $uamOptions['lock_file'] == 'true'
+        if (!$oUserAccessManager->isPermalinksActive()
+            && $aUamOptions['lock_file'] == 'true'
         ) {
             //Adding '.jpg' to the prefix prevents thickbox display error
-            $prefix = home_url('/').'.jpg?uamgetfile=';
+            $sPrefix = home_url('/').'.jpg?uamgetfile=';
 
-            $image->imageURL = $prefix.$image->imageURL.'&'.$suffix;
-            $image->thumbURL = $prefix.$image->thumbURL.'&'.$suffix;
+            $oImage->imageURL = $sPrefix.$oImage->imageURL.'&'.$sSuffix;
+            $oImage->thumbURL = $sPrefix.$oImage->thumbURL.'&'.$sSuffix;
         } else {
-            $image->imageURL = $image->imageURL.'?'.$suffix;
-            $image->thumbURL = $image->thumbURL.'?'.$suffix;
+            $oImage->imageURL = $oImage->imageURL.'?'.$sSuffix;
+            $oImage->thumbURL = $oImage->thumbURL.'?'.$sSuffix;
         }
     }
     
     /**
      * Returns the image file object.
      * 
-     * @param string $fileUrl The url of the image.
+     * @param string $sFileUrl The url of the image.
      * 
      * @return object
      */
-    public function getNggImageFileObject($fileUrl)
+    public function getNggImageFileObject($sFileUrl)
     {
-        $image = $this->_getImageFromUrl($fileUrl);
-        $object->id = $image->pid;
-        $object->isImage = true;
-        $object->type = 'nggImage';
+        $oImage = $this->_getImageFromUrl($sFileUrl);
+
+        $oObject = new stdClass();
+        $oObject->id = $oImage->pid;
+        $oObject->isImage = true;
+        $oObject->type = 'nggImage';
         
-        if ($image->isThumb) {
-            $object->file = $image->thumbPath;
+        if ($oImage->isThumb) {
+            $oObject->file = $oImage->thumbPath;
         } else {
-            $object->file = $image->imagePath;
+            $oObject->file = $oImage->imagePath;
         }
         
-        return $object;
+        return $oObject;
     }
     
     /**
      * Returns the id of the image by the given url.
      * 
-     * @param string $url The url of the image.
+     * @param string $sUrl The url of the image.
      * 
-     * @return integer
+     * @return object
      */
-    private function _getImageFromUrl($url)
+    private function _getImageFromUrl($sUrl)
     {
-        global $ngg, $userAccessManager;
+        global $ngg, $oUserAccessManager;
         
-        if ($userAccessManager->isPermalinksActive()) {
-            $url = $ngg->options['gallerypath'].$url;
+        if ($oUserAccessManager->isPermalinksActive()) {
+            $sUrl = $ngg->options['gallerypath'].$sUrl;
         }
         
-        $url = str_replace(site_url().'/', '', $url);        
-        $thumbsStr = '/thumbs/thumbs_';
-        $thumb = false;
+        $sUrl = str_replace(site_url().'/', '', $sUrl);
+        $sThumbs = '/thumbs/thumbs_';
+        $blThumb = false;
         
-        if (strpos($url, $thumbsStr)) {
-            $expUrl = explode($thumbsStr, $url);
-            $fileName = $expUrl[count($expUrl)-1];
-            $galleryPath = $expUrl[0];
-            $thumb = true;
+        if (strpos($sUrl, $sThumbs)) {
+            $sExpUrl = explode($sThumbs, $sUrl);
+            $sFileName = $sExpUrl[count($sExpUrl)-1];
+            $sGalleryPath = $sExpUrl[0];
+            $blThumb = true;
         } else {
-            $expUrl = explode('/', $url);
-            $fileName = $expUrl[count($expUrl)-1];
-            unset($expUrl[count($expUrl)-1]);
-            $galleryPath = implode('/', $expUrl);
+            $sExpUrl = explode('/', $sUrl);
+            $sFileName = $sExpUrl[count($sExpUrl)-1];
+            unset($sExpUrl[count($sExpUrl)-1]);
+            $sGalleryPath = implode('/', $sExpUrl);
         }
         
         global $wpdb;
         
-        $galleryId = $wpdb->get_var(
+        $iGalleryId = $wpdb->get_var(
             "SELECT gid
             FROM $wpdb->nggallery
-            WHERE path = '".$galleryPath."'"
+            WHERE path = '".$sGalleryPath."'"
         );
         
-        $imageId = $wpdb->get_var(
+        $iImageId = $wpdb->get_var(
             "SELECT pid
             FROM $wpdb->nggpictures
-            WHERE galleryid = ".$galleryId."
-            AND filename = '".$fileName."'"
+            WHERE galleryid = ".$iGalleryId."
+            AND filename = '".$sFileName."'"
         );
         
         global $nggdb;
-        $image = $nggdb->find_image($imageId);
+        $oImage = $nggdb->find_image($iImageId);
         
-        $image->id = $id;
-        $image->isThumb = $thumb;
+        $oImage->id = $iImageId;
+        $oImage->isThumb = $blThumb;
 
-        return $image;
+        return $oImage;
     }
     
     
@@ -524,52 +524,53 @@ class UamNgg
     /**
      * Returns the full album by the given id.
      * 
-     * @param integer $albumId   The id of the album.
-     * @param object  $userGroup The current user group.
+     * @param integer $iAlbumId   The id of the album.
+     * @param object  $oUserGroup The current user group.
      * 
      * @return object
      */
-    public function getNggAlbumFull($albumId, $userGroup)
+    public function getNggAlbumFull($iAlbumId, $oUserGroup)
     {
         return array();
     }
     
     /**
-     * Returns all albums which are assigned to the usergroup.
+     * Returns all albums which are assigned to the user group.
      * 
-     * @param array  $realAlbums The albums which are assigned directly.
-     * @param object $userGroup  The current user group.
+     * @param array  $aRealAlbums The albums which are assigned directly.
+     * @param object $oUserGroup  The current user group.
      * 
      * @return array
      */
-    public function getNggAlbumFullObjects($realAlbums, $userGroup)
+    public function getNggAlbumFullObjects($aRealAlbums, $oUserGroup)
     {
-        return $realAlbums;
+        return $aRealAlbums;
     }
     
     /**
      * Returns the full gallery by the given id.
      * 
-     * @param integer $galleryId The id of the gallery.
-     * @param object  $userGroup The current user group.
+     * @param integer $iGalleryId The id of the gallery.
+     * @param object  $oUserGroup The current user group.
      * 
      * @return object
      */
-    public function getNggGalleryFull($galleryId, $userGroup)
+    public function getNggGalleryFull($iGalleryId, $oUserGroup)
     {
         global $nggdb;
-        $gallery = $nggdb->find_gallery($galleryId);
-        $albums = $nggdb->find_all_album();
+        //$oGallery = $nggdb::find_gallery($iGalleryId);
+        $aAlbums = $nggdb->find_all_album();
 
         $isRecursiveMember = array();
         
-        foreach ($albums as $album) {
-            if (is_array(unserialize($album->sortorder))
-                && in_array($galleryId, unserialize($album->sortorder))
-                && $userGroup->objectIsMember('nggAlbum', $album->id)            
+        foreach ($aAlbums as $oAlbum) {
+            if (is_array(unserialize($oAlbum->sortorder))
+                && in_array($iGalleryId, unserialize($oAlbum->sortorder))
+                && $oUserGroup->objectIsMember('nggAlbum', $oAlbum->id)
             ) {
-                $albumObject->name = $album->name;
-                $isRecursiveMember['nggAlbum'][] = $albumObject;
+                $oAlbumObject = new stdClass();
+                $oAlbumObject->name = $oAlbum->name;
+                $isRecursiveMember['nggAlbum'][] = $oAlbumObject;
             }
         }
         
@@ -577,64 +578,65 @@ class UamNgg
     }
     
     /**
-     * Returns all galleries which are assigned to the usergroup.
+     * Returns all galleries which are assigned to the user group.
      * 
-     * @param array  $realGalleries The galleries which are assigned directly.
-     * @param object $userGroup     The current user group.
+     * @param array  $aRealGalleries The galleries which are assigned directly.
+     * @param object $oUserGroup     The current user group.
      * 
      * @return array
      */
-    public function getNggGalleryFullObjects($realGalleries, $userGroup)
+    public function getNggGalleryFullObjects($aRealGalleries, $oUserGroup)
     {
         //TODO
-        return $realGalleries;
+        return $aRealGalleries;
     }
     
     /**
      * Returns the full image by the given id.
      * 
-     * @param integer $imageId   The id of the gallery.
-     * @param object  $userGroup The user group.
+     * @param integer $iImageId   The id of the gallery.
+     * @param object  $oUserGroup The user group.
      * 
      * @return object
      */
-    public function getNggImageFull($imageId, $userGroup)
+    public function getNggImageFull($iImageId, $oUserGroup)
     {
         global $nggdb;
-        $image = $nggdb->find_image($imageId);
+        $image = $nggdb->find_image($iImageId);
 
         $isRecursiveMember = array();
 
-        if ($userGroup->objectIsMember('nggGallery', $image->galleryid)) {
-            $gallery = $nggdb->find_gallery($image->galleryid);
-            
-            $galleryObject->name = $gallery->name;
+        if ($oUserGroup->objectIsMember('nggGallery', $image->galleryid)) {
+            $oGallery = $nggdb->find_gallery($image->galleryid);
+
+            $oGalleryObject = new stdClass();
+            $oGalleryObject->name = $oGallery->name;
             
             $galleryIsRecursiveMember 
-                = $this->getNggGalleryFull($image->galleryid, $userGroup);
+                = $this->getNggGalleryFull($image->galleryid, $oUserGroup);
 
             if ($galleryIsRecursiveMember !== array()) {
-                $galleryObject->recursiveMember = $galleryIsRecursiveMember;
+                $oGalleryObject->recursiveMember = $galleryIsRecursiveMember;
             }
             
-            $isRecursiveMember['nggGallery'][] = $galleryObject;
+            $isRecursiveMember['nggGallery'][] = $oGalleryObject;
         }
         
         return $isRecursiveMember;
     }
     
     /**
-     * Returns all images which are assigned to the usergroup.
+     * Returns all images which are assigned to the user group.
      * 
-     * @param array  $realImages The galleries which are assigned directly.
-     * @param object $userGroup  The current user group.
+     * @param array  $aRealImages The galleries which are assigned directly.
+     * @param object $oUserGroup  The current user group.
      * 
      * @return array
      */
-    public function getNggImageFullObjects($realImages, $userGroup)
+    public function getNggImageFullObjects($aRealImages, $oUserGroup)
     {
         //TODO
-        return $realImages;
+        return $aRealImages;
     }
     
     
@@ -643,145 +645,145 @@ class UamNgg
      */
     
     /**
-     * Manupulates the output of a gallery.
+     * Manipulates the output of a gallery.
      * 
-     * @param string  $output   The output.
-     * @param integer $gallerId The gallery id.
+     * @param string  $sOutput   The output.
+     * @param integer $iGalleryId The gallery id.
      * 
      * @return string
      */
-    public function showGalleryContent($output, $gallerId)
+    public function showGalleryContent($sOutput, $iGalleryId)
     {
-        global $userAccessManager;
+        global $oUserAccessManager;
         
-        $uamAccessHandler = $userAccessManager->getAccessHandler();
-        $options = $this->getAdminOptions();
+        $oUamAccessHandler = $oUserAccessManager->getAccessHandler();
+        $aOptions = $this->getAdminOptions();
         
-        if (!$uamAccessHandler->checkObjectAccess('nggGallery', $gallerId)) {
-            $output = $options['gallery_content'];
+        if (!$oUamAccessHandler->checkObjectAccess('nggGallery', $iGalleryId)) {
+            $sOutput = $aOptions['gallery_content'];
         }
         
-        return $output;
+        return $sOutput;
     }
     
     /**
      * Filters the images.
      * 
-     * @param array $images The images of the gallery.
+     * @param array $aImages The images of the gallery.
      * 
      * @return array
      */
-    public function showGalleryImages($images)
+    public function showGalleryImages($aImages)
     {
-        $options = $this->getAdminOptions();
+        $aOptions = $this->getAdminOptions();
         
-        if ($options['hide_image'] == 'true') {
-            global $userAccessManager;
+        if ($aOptions['hide_image'] == 'true') {
+            global $oUserAccessManager;
             
-            $uamAccessHandler = $userAccessManager->getAccessHandler();
-            $options = $this->getAdminOptions();
-            $filterdImages = array();
+            $uamAccessHandler = $oUserAccessManager->getAccessHandler();
+            $aOptions = $this->getAdminOptions();
+            $aFilteredImages = array();
             
-            foreach ($images as $key => $image) {
-                if ($uamAccessHandler->checkObjectAccess('nggImage', $image->pid)) {
-                    $filterdImages[$key] = $image;
+            foreach ($aImages as $sKey => $oImage) {
+                if ($uamAccessHandler->checkObjectAccess('nggImage', $oImage->pid)) {
+                    $aFilteredImages[$sKey] = $oImage;
                 }
             }
             
-            return $filterdImages;
+            return $aFilteredImages;
         }
         
-        return $images;
+        return $aImages;
     }
     
     /**
      * Manipulates the gallery for a album.
      * 
-     * @param object $gallery The gallery.
+     * @param object $oGallery The gallery.
      * 
      * @return object
      */
-    public function showGalleryObjectForAlbum($gallery)
+    public function showGalleryObjectForAlbum($oGallery)
     {
-        global $userAccessManager;
+        global $oUserAccessManager;
 
         //Manipulate gallery title
-        $uamAccessHandler = $userAccessManager->getAccessHandler();
-        $options = $this->getAdminOptions();
+        $oUamAccessHandler = $oUserAccessManager->getAccessHandler();
+        $aOptions = $this->getAdminOptions();
         
-        if ($options['hide_gallery_title'] == 'true'
-            && !$uamAccessHandler->checkObjectAccess('nggGallery', $gallery->gid)
+        if ($aOptions['hide_gallery_title'] == 'true'
+            && !$oUamAccessHandler->checkObjectAccess('nggGallery', $oGallery->gid)
         ) {
-            $gallery->title = $options['gallery_title'];
+            $oGallery->title = $aOptions['gallery_title'];
         }
         
         //Manipulate preview image
-        $uamOptions = $userAccessManager->getAdminOptions();
-        $suffix = 'uamfiletype=nggImage';
+        $aUamOptions = $oUserAccessManager->getAdminOptions();
+        $sSuffix = 'uamfiletype=nggImage';
         
-        if (!$userAccessManager->isPermalinksActive()
-            && $uamOptions['lock_file'] == 'true'
+        if (!$oUserAccessManager->isPermalinksActive()
+            && $aUamOptions['lock_file'] == 'true'
         ) {
-            $prefix = home_url('/').'?uamgetfile=';
+            $sPrefix = home_url('/').'?uamgetfile=';
 
-            $gallery->previewurl = $prefix.$gallery->previewurl.'&'.$suffix;
+            $oGallery->previewurl = $sPrefix.$oGallery->previewurl.'&'.$sSuffix;
         } else {
-            $gallery->previewurl = $gallery->previewurl.'?'.$suffix;
+            $oGallery->previewurl = $oGallery->previewurl.'?'.$sSuffix;
         }
         
-        return $gallery;
+        return $oGallery;
     }
     
     /**
      * Filters the galleries.
      * 
-     * @param array $galleries The galleries of the album.
+     * @param array $aGalleries The galleries of the album.
      * 
      * @return array
      */
-    public function showGalleriesForAlbum($galleries)
+    public function showGalleriesForAlbum($aGalleries)
     {
-        $options = $this->getAdminOptions();
+        $aOptions = $this->getAdminOptions();
         
-        if ($options['hide_gallery'] == 'true') {
-            global $userAccessManager;
+        if ($aOptions['hide_gallery'] == 'true') {
+            global $oUserAccessManager;
             
-            $uamAccessHandler = $userAccessManager->getAccessHandler();
-            $options = $this->getAdminOptions();
-            $filteredGalleries = array();
+            $oUamAccessHandler = $oUserAccessManager->getAccessHandler();
+            //$aOptions = $this->getAdminOptions();
+            $aFilteredGalleries = array();
             
-            foreach ($galleries as $gallerId => $gallery) {
-                if ($uamAccessHandler->checkObjectAccess('nggGallery', $gallerId)) {
-                    $filteredGalleries[$gallerId] = $gallery;
+            foreach ($aGalleries as $sGalleryId => $oGallery) {
+                if ($oUamAccessHandler->checkObjectAccess('nggGallery', $sGalleryId)) {
+                    $aFilteredGalleries[$sGalleryId] = $oGallery;
                 }
             }
     
-            return $filteredGalleries;
+            return $aFilteredGalleries;
         }
         
-        return $galleries;
+        return $aGalleries;
     }
 
     
     /**
-     * Manupulates the output of a album.
+     * Manipulates the output of a album.
      * 
-     * @param string  $output  The output.
-     * @param integer $albumId The album id.
+     * @param string  $sOutput  The output.
+     * @param integer $iAlbumId The album id.
      * 
      * @return string
      */
-    public function showAlbumContent($output, $albumId)
+    public function showAlbumContent($sOutput, $iAlbumId)
     {
-        global $userAccessManager;
+        global $oUserAccessManager;
         
-        $uamAccessHandler = $userAccessManager->getAccessHandler();
+        $uamAccessHandler = $oUserAccessManager->getAccessHandler();
         $options = $this->getAdminOptions();
         
-        if (!$uamAccessHandler->checkObjectAccess('nggAlbum', $albumId)) {
-            $output = $options['album_content'];
+        if (!$uamAccessHandler->checkObjectAccess('nggAlbum', $iAlbumId)) {
+            $sOutput = $options['album_content'];
         }
         
-        return $output;
+        return $sOutput;
     }
 }

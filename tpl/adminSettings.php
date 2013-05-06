@@ -14,8 +14,8 @@
  * @version   SVN: $Id$
  * @link      http://wordpress.org/extend/plugins/user-access-manager/nextgen-gallery/
  */
-global $uamNgg;
-$uamNggOptions = $uamNgg->getAdminOptions();
+global $oUamNgg;
+$uamNggOptions = $oUamNgg->getAdminOptions();
 
 if (isset($_POST['update_uamngg_settings'])) {    
     foreach ($uamNggOptions as $option => $value) {
