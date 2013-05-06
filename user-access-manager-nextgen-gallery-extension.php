@@ -23,7 +23,7 @@
 //Paths
 load_plugin_textdomain(
     'user-access-manager-nextgen-gallery-extension', 
-    false, 
+    false,
     'user-access-manager-nextgen-gallery-extension/lang'
 );
 
@@ -44,7 +44,7 @@ if (defined('UAM_LOCAL_DEBUG')) {
 require_once 'includes/language.define.php';
 
 //Check requirements
-global $ngg, $userAccessManager;
+global $ngg, $oUserAccessManager;
 
 if (!isset($ngg)) {
     add_action(
@@ -76,7 +76,7 @@ if (!isset($ngg)) {
 require_once 'class/UamNgg.class.php';
 
 if (class_exists("UamNgg")) {
-    $uamNgg = new UamNgg($userAccessManager);
+    $uamNgg = new UamNgg($oUserAccessManager);
 }
 
 if (!function_exists("initUamToNggExtension")) {
